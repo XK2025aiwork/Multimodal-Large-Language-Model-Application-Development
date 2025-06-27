@@ -8,7 +8,10 @@
 └── README.md              
 ```
 
-## 🚀 快速开始  
+
+
+
+## 🚀 快速开始  这里最推荐Second里安装的大模型，因为First中涉及Picgo网站的url调用，该网站经常崩掉，所以可以优先尝试Second模型的部署
 
 ### 1. 克隆仓库  
 
@@ -35,6 +38,10 @@ python GUI.py
 cd Mycode/Second/siliconflow-chat/backend 
 
 python app.py
+
+需要重新打开一个终端
+
+cd Mycode/Second/siliconflow-chat/frontend 
 
 # 指定浏览器打开（以Safari为例）
 open -a Safari index.html
