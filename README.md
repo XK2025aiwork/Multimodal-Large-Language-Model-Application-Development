@@ -16,9 +16,11 @@
 ### 1. 克隆仓库  
 
 ```bash  
-git clone https://github.com/XK2025aiwork/Multimodal-Large-Language-Model-Application-Development.git  
-cd Multimodal-Large-Language-Model-Application-Development  
+mkdir -p ~/MyProjects
+git clone https://github.com/XK2025aiwork/Multimodal-Large-Language-Model-Application-Development.git ~/MyProjects/Multimodal-Large-Language-Model-Application-Development
+cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development  
 ```
+
 
 ### 2. 安装依赖  
 
@@ -35,9 +37,11 @@ cd Mycode/First/PythonProject
 python GUI.py
 
 # 运行应用2  
-cd Mycode/Second/siliconflow-chat/backend 
+cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Second/siliconflow-chat/backend
 
 python app.py &
+
+cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Second/siliconflow-chat/frontend
 
 open -a Safari index.html
 
