@@ -39,7 +39,9 @@ python GUI.py
 # 运行应用2  
 cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Second/siliconflow-chat/backend
 
-python app.py &
+python app.py
+
+#重新再打开一个终端界面！！！！
 
 cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Second/siliconflow-chat/frontend
 
