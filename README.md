@@ -11,7 +11,7 @@
 
 
 
-## 🚀 快速开始  这里最推荐Second里安装的大模型（也就是应用2的代码），因为First中涉及Picgo网站的url调用，该网站经常崩掉，所以可以优先尝试Second模型的部署
+## 🚀 快速开始  这里最推荐Second和Third里安装的大模型（也就是应用2和应用3的代码），因为First中涉及Picgo网站的url调用，该网站经常崩掉，所以可以优先尝试Second模型的部署
 
 ### 1. 克隆仓库  
 
@@ -30,12 +30,17 @@ pip install -r requirements.txt
 
 ### 3. 运行应用程序  
 
+#### 3.1应用1(First 不推荐)
+
 ```bash  
 # 运行应用1  
-cd Mycode/First/PythonProject
+cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/First/PythonProject
 
 python GUI.py
 
+```
+#### 3.2应用2(Second 推荐)
+```bash  
 # 运行应用2  
 cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Second/siliconflow-chat/backend
 
@@ -46,8 +51,9 @@ python app.py
 cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Second/siliconflow-chat/frontend
 
 open -a Safari index.html
-
-# 运行应用3  
+```
+#### 3.3应用3(Third 推荐)
+```bash  
 cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Third
 
 open -a Safari complete626A.html
