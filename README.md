@@ -48,7 +48,7 @@ cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/S
 open -a Safari index.html
 
 # 运行应用3  
-cd Mycode/Third
+cd ~/MyProjects/Multimodal-Large-Language-Model-Application-Development/Mycode/Third
 
 open -a Safari complete626A.html
 ```
