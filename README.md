@@ -1,7 +1,7 @@
 ## 
 
 ```
-├── First/          
+├── First/
 ├── Second/          
 ├── Third/          
 ├── requirements.txt       
@@ -37,13 +37,8 @@ python GUI.py
 # 运行应用2  
 cd Mycode/Second/siliconflow-chat/backend 
 
-python app.py
+python app.py &
 
-需要重新打开一个终端
-
-cd Mycode/Second/siliconflow-chat/frontend 
-
-# 指定浏览器打开（以Safari为例）
 open -a Safari index.html
 
 # 运行应用3  
