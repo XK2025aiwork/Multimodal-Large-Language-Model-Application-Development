@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>智能文件分析系统</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    }
+    
+    :root {
+      --primary: #1a2a6c;
+      --primary-dark: #0d1b4d;
+      --secondary: #b21f1f;
+      --accent: #28a745;
+      --danger: #dc3545;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --border: #ced4da;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
+      color: var(--dark);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .sidebar {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.95);
+      border-right: 1px solid var(--border);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-header {
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 15px;
+    }
+    
+    .sidebar h3 {
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sidebar h3 i {
+      font-size: 1.1em;
+    }
+    
+    .dialog-list {
+      margin-bottom: 20px;
+      max-height: 40vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--light);
+    }
+    
+    .dialog-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px var(--shadow);
+      transition: all 0.3s ease;
+    }
+    
+    .dialog-item:hover {
+      background: #e9ecef;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 6px var(--shadow);
+    }
+    
+    .dialog-item input[type=text] {
+      flex: 1;
+      padding: 6px 8px;
+      margin-right: 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .dialog-item input[type=checkbox] {
+      margin-right: 8px;
+    }
+    
+    .dialog-item button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.3s;
+    }
+    
+    .dialog-item button:hover {
+      background: var(--primary-dark);
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .controls button {
+      flex: 1;
+      padding: 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .controls button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+    
+    .file-upload-section {
+      margin-top: auto;
+    }
+    
+    .file-upload-section h4 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .file-input-container {
+      position: relative;
+      margin-bottom: 15px;
+    }
+    
+    .file-input-container input[type=file] {
+      width: 100%;
+      padding: 8px;
+      border: 2px dashed var(--primary);
+      border-radius: 8px;
+      background: rgba(26, 42, 108, 0.05);
+      cursor: pointer;
+    }
+    
+    .uploaded-files {
+      max-height: 30vh;
+      overflow-y: auto;
+    }
+    
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px var(--shadow);
+      transition: all 0.3s ease;
+    }
+    
+    .file-item:hover {
+      transform: translateX(3px);
+    }
+    
+    .file-info {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    
+    .file-type-icon {
+      margin-right: 8px;
+      font-size: 1.2rem;
+    }
+    
+    .file-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+    
+    .file-actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .file-actions button {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    
+    .insert-btn {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .insert-btn:hover {
+      background: #218838;
+    }
+    
+    .delete-btn {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .delete-btn:hover {
+      background: #c82333;
+    }
+    
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .model-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .model-selector label {
+      font-weight: 500;
+      color: var(--primary);
+    }
+    
+    .model-selector select {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: white;
+      font-size: 0.9rem;
+    }
+    
+    .header-actions button {
+      padding: 8px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .header-actions button:hover {
+      background: var(--primary-dark);
+    }
+    
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><rect fill="none" stroke="%231a2a6c" stroke-width="2" x="25" y="25" width="50" height="50" rx="10" ry="10"/></svg>');
+    }
+    
+    .message {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 2px 5px var(--shadow);
+      animation: fadeIn 0.3s ease;
+      line-height: 1.5;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.user {
+      align-self: flex-end;
+      background: var(--primary);
+      color: white;
+      border-bottom-right-radius: 2px;
+    }
+    
+    .message.ai {
+      align-self: flex-start;
+      background: var(--light);
+      border-bottom-left-radius: 2px;
+      border: 1px solid var(--border);
+    }
+    
+    .message-content {
+      white-space: pre-wrap;
+    }
+    
+    .message-time {
+      font-size: 0.75rem;
+      color: var(--gray);
+      margin-top: 5px;
+      text-align: right;
+    }
+    
+    .input-area {
+      padding: 15px 20px;
+      border-top: 1px solid var(--border);
+      background: white;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .input-area input[type=text] {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    
+    .input-area input[type=text]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+    }
+    
+    .input-area button {
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .input-area button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+    
+    .input-area button:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .file-content {
+      background: #e9f7fe;
+      border-left: 3px solid #1a8cff;
+      padding: 10px 15px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 5px;
+      font-size: 0.9em;
+    }
+    
+    .status-bar {
+      padding: 8px 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .toggle-sidebar {
+      display: none;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 10px;
+      z-index: 100;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        position: absolute;
+        left: -100%;
+        width: 85%;
+        height: 100%;
+        z-index: 10;
+        background: white;
+      }
+      
+      .sidebar.active {
+        left: 0;
+      }
+      
+      .chat-container {
+        height: 100vh;
+      }
+      
+      .toggle-sidebar {
+        display: block;
+      }
+    }
+    
+    /* 滚动条样式 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* 图标样式 */
+    .icon {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      stroke-width: 0;
+      stroke: currentColor;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-sidebar" id="btnToggleSidebar">☰</button>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3><i class="icon">📁</i> 对话管理</h3>
+      <div class="controls">
+        <button id="btnNewDialog"><i class="icon">+</i> 新建对话</button>
+        <button id="btnDeleteDialogs"><i class="icon">🗑️</i> 删除选中</button>
+      </div>
+    </div>
+    
+    <div class="dialog-list" id="dialogList">
+      <!-- 对话框列表将通过JS动态生成 -->
+    </div>
+    
+    <div class="file-upload-section">
+      <h4><i class="icon">📎</i> 文件管理</h4>
+      <div class="file-input-container">
+        <input type="file" id="multiFileInput" multiple accept=".jpg,.jpeg,.png,.gif,.txt,.tex,.doc,.docx,.pdf" />
+      </div>
+      
+      <div class="uploaded-files" id="uploadedFiles">
+        <!-- 上传的文件列表将通过JS动态生成 -->
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <div class="header">
+      <div class="model-selector">
+        <label for="apiSelector">模型选择：</label>
+        <select id="apiSelector">
+          <option value="deepseek">DeepSeek-R1</option>
+          <option value="qwen">通义千问</option>
+          <option value="qvq">QVQ-72B</option>
+        </select>
+      </div>
+      
+      <div class="header-actions">
+        <button id="btnSaveChat"><i class="icon">💾</i> 保存聊天记录</button>
+      </div>
+    </div>
+    
+    <div class="messages" id="messages">
+      <div class="message ai">
+        <div class="message-content">您好！我是智能文件分析助手，请上传文件或输入指令开始分析。</div>
+        <div class="message-time">系统消息</div>
+      </div>
+    </div>
+    
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="输入消息或引用文件名（例如：分析sample.png）..." autocomplete="off" />
+      <button id="btnSend"><i class="icon">✉️</i> 发送</button>
+    </div>
+    
+    <div class="status-bar" id="statusBar">
+      <i class="icon">✅</i> 系统就绪
+    </div>
+  </div>
+
+
+  <script>
+    // 文件类型图标映射
+    const fileTypeIcons = {
+      'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
+      'txt': '📄', 'tex': '📄', 'doc': '📝', 'docx': '📝', 'pdf': '📑'
+    };
+    
+    // 敏感词列表
+    const sensitiveWords = ['暴力','黑鬼', '色情', '恐怖主义', '毒品', '赌博', '诈骗', '血腥',
+  '自杀', '宗教极端', '邪教', '人身攻击', '种族歧视', '仇恨', '辱骂', '未成年人', '个人隐私', '医疗诊断', '法律建议', '金融诈骗', '政治敏感', '虚假信息', '网络安全', '恶意软件', '钓鱼攻击', '垃圾信息', '骚扰信息', '侵犯版权', '侵犯商标', '侵犯隐私', '不当内容', '不实宣传', '虚假广告', '误导性信息', '恶意评论', '恶意链接', '网络暴力', '网络欺凌', '网络诈骗', '网络钓鱼', '网络攻击', '网络骚扰', '网络谣言', '网络谩骂', '网络诽谤', '网络侵权', '网络诈骗', '网络钓鱼'];
+    // 对话数据存储
+    let dialogs = [];
+    let currentDialogId = null;
+    let uploadedFiles = {}; // 存储文件ID和文件名的映射
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      newDialog();
+      setupEventListeners();
+      loadUploadedFiles(); // 加载已上传的文件
+    });
+    
+    // 设置事件监听器
+    function setupEventListeners() {
+      document.getElementById('multiFileInput').addEventListener('change', handleMultipleFileUpload);
+      document.getElementById('btnSend').addEventListener('click', sendMessage);
+      document.getElementById('userInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage();
+      });
+      document.getElementById('btnNewDialog').addEventListener('click', newDialog);
+      document.getElementById('btnDeleteDialogs').addEventListener('click', deleteSelectedDialogs);
+      document.getElementById('btnSaveChat').addEventListener('click', saveChat);
+      document.getElementById('btnToggleSidebar').addEventListener('click', toggleSidebar);
+    }
+    
+    // 切换侧边栏显示
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('active');
+    }
+    
+    // 更新状态栏
+    function updateStatus(message, isError = false) {
+      const statusBar = document.getElementById('statusBar');
+      statusBar.innerHTML = isError ? 
+        `<i class="icon">❌</i> ${message}` : 
+        `<i class="icon">✅</i> ${message}`;
+    }
+    
+    // 检查是否包含敏感词
+    function containsSensitiveWords(text) {
+      const lowerText = text.toLowerCase();
+      return sensitiveWords.some(word => lowerText.includes(word.toLowerCase()));
+    }
+    
+    // 加载已上传的文件
+    function loadUploadedFiles() {
+      updateStatus('正在加载文件...');
+      fetch('http://127.0.0.1:5001/files')
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP错误! 状态: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(files => {
+          files.forEach(file => {
+            addFileToList(file.file_id, file.filename);
+            uploadedFiles[file.file_id] = file.filename;
+          });
+          updateStatus(`已加载 ${files.length} 个文件`);
+        })
+        .catch(err => {
+          updateStatus('加载文件失败: ' + err.message, true);
+        });
+    }
+    
+    // 创建新对话
+    function newDialog() {
+      const dialogId = Date.now().toString();
+      const dialog = {
+        id: dialogId,
+        title: `新对话 ${dialogs.length + 1}`,
+        messages: [],
+        createdAt: new Date()
+      };
+      
+      dialogs.push(dialog);
+      currentDialogId = dialogId;
+      renderDialogList();
+      renderMessages();
+      updateStatus(`已创建新对话: ${dialog.title}`);
+    }
+    
+    // 切换对话
+    function switchDialog(dialogId) {
+      currentDialogId = dialogId;
+      renderMessages();
+      const dialog = dialogs.find(d => d.id === dialogId);
+      if (dialog) {
+        updateStatus(`已切换到对话: ${dialog.title}`);
+      }
+    }
+    
+    // 重命名对话
+    function renameDialog(dialogId, newTitle) {
+      const dialog = dialogs.find(d => d.id === dialogId);
+      if (dialog) {
+        dialog.title = newTitle;
+        renderDialogList();
+        updateStatus(`对话已重命名为: ${newTitle}`);
+      }
+    }
+    
+    // 删除选中的对话
+    function deleteSelectedDialogs() {
+      const checkboxes = document.querySelectorAll('.dialog-item input[type="checkbox"]:checked');
+      if (checkboxes.length === 0) {
+        updateStatus('请先选择要删除的对话', true);
+        return;
+      }
+      
+      checkboxes.forEach(checkbox => {
+        const dialogId = checkbox.getAttribute('data-id');
+        dialogs = dialogs.filter(d => d.id !== dialogId);
+      });
+      
+      if (dialogs.length === 0) {
+        newDialog();
+      } else if (!dialogs.some(d => d.id === currentDialogId)) {
+        currentDialogId = dialogs[0].id;
+      }
+      
+      renderDialogList();
+      renderMessages();
+      updateStatus(`已删除 ${checkboxes.length} 个对话`);
+    }
+    
+    // 渲染对话列表
+    function renderDialogList() {
+      const dialogList = document.getElementById('dialogList');
+      dialogList.innerHTML = '';
+      
+      dialogs.forEach(dialog => {
+        const isCurrent = dialog.id === currentDialogId;
+        const dialogItem = document.createElement('div');
+        dialogItem.className = `dialog-item ${isCurrent ? 'current' : ''}`;
+        
+        dialogItem.innerHTML = `
+          <input type="checkbox" data-id="${dialog.id}">
+          <input type="text" data-id="${dialog.id}" value="${dialog.title}" 
+                 style="${isCurrent ? 'font-weight: bold;' : ''}">
+          <button data-id="${dialog.id}">切换</button>
+        `;
+        
+        dialogList.appendChild(dialogItem);
+      });
+      
+      // 添加事件监听
+      document.querySelectorAll('.dialog-item input[type="text"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          renameDialog(e.target.getAttribute('data-id'), e.target.value);
+        });
+      });
+      
+      document.querySelectorAll('.dialog-item button').forEach(button => {
+        button.addEventListener('click', (e) => {
+          switchDialog(e.target.getAttribute('data-id'));
+        });
+      });
+    }
+    
+    // 渲染消息
+    function renderMessages() {
+      const messagesContainer = document.getElementById('messages');
+      messagesContainer.innerHTML = '';
+      
+      const dialog = dialogs.find(d => d.id === currentDialogId);
+      if (!dialog) return;
+      
+      // 添加欢迎消息
+      if (dialog.messages.length === 0) {
+        const welcomeMsg = document.createElement('div');
+        welcomeMsg.className = 'message ai';
+        welcomeMsg.innerHTML = `
+          <div class="message-content">您好！我是智能文件分析助手，请上传文件或输入指令开始分析。</div>
+          <div class="message-time">系统消息</div>
+        `;
+        messagesContainer.appendChild(welcomeMsg);
+      }
+      
+      // 渲染所有消息
+      dialog.messages.forEach(msg => {
+        addMessageToUI(msg.from, msg.text, msg.time);
+      });
+      
+      // 滚动到底部
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // 添加消息到UI
+    function addMessageToUI(sender, text, timestamp) {
+      const messagesContainer = document.getElementById('messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      
+      messageDiv.innerHTML = `
+        <div class="message-content">${text}</div>
+        <div class="message-time">${timestamp}</div>
+      `;
+      
+      messagesContainer.appendChild(messageDiv);
+      
+      // 滚动到底部
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // 添加消息到当前对话
+    function addMessageToDialog(sender, text, timestamp) {
+      const dialog = dialogs.find(d => d.id === currentDialogId);
+      if (dialog) {
+        dialog.messages.push({
+          from: sender,
+          text: text,
+          time: timestamp
+        });
+      }
+    }
+    
+    // 格式化时间
+    function formatTime(date = new Date()) {
+      return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    }
+    
+    // 添加文件列表项
+    function addFileToList(fileId, filename) {
+      const container = document.getElementById("uploadedFiles");
+      
+      // 获取文件扩展名
+      const ext = filename.split('.').pop().toLowerCase();
+      // 获取文件类型图标
+      const icon = fileTypeIcons[ext] || '📁';
+      
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.id = `file-${fileId}`;
+      
+      fileItem.innerHTML = `
+        <div class="file-info">
+          <span class="file-type-icon">${icon}</span>
+          <span class="file-name" title="${filename}">${filename}</span>
+        </div>
+        <div class="file-actions">
+          <button class="insert-btn" data-filename="${filename}">插入</button>
+          <button class="delete-btn" data-fileid="${fileId}">删除</button>
+        </div>
+      `;
+      
+      container.appendChild(fileItem);
+      uploadedFiles[fileId] = filename;
+      
+      // 添加事件监听
+      fileItem.querySelector('.insert-btn').addEventListener('click', (e) => {
+        insertFilename(e.target.getAttribute('data-filename'));
+      });
+      
+      fileItem.querySelector('.delete-btn').addEventListener('click', (e) => {
+        deleteFileById(e.target.getAttribute('data-fileid'));
+      });
+    }
+    
+    // 插入文件名到输入框
+    function insertFilename(filename) {
+      const input = document.getElementById('userInput');
+      input.value = `分析${filename}`;
+      input.focus();
+      updateStatus(`已插入文件名: ${filename}`);
+    }
+    
+    // 删除文件
+    function deleteFileById(fileId) {
+      updateStatus(`正在删除文件...`);
+      fetch(`http://127.0.0.1:5001/delete/${fileId}`, {
+        method: "DELETE"
+      })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(data => {
+            throw new Error(data.error || `HTTP错误! 状态: ${res.status}`);
+          });
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data.success) {
+          const elem = document.getElementById(`file-${fileId}`);
+          if (elem) elem.remove();
+          delete uploadedFiles[fileId];
+          updateStatus(`文件已删除`);
+        } else {
+          throw new Error(data.error || "未知错误");
+        }
+      })
+      .catch(err => {
+        updateStatus(`删除失败: ${err.message}`, true);
+      });
+    }
+    
+    // 多文件上传处理
+    function handleMultipleFileUpload(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+      
+      updateStatus(`正在上传 ${files.length} 个文件...`);
+      
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        fetch("http://127.0.0.1:5001/upload", {
+          method: "POST",
+          body: formData
+        })
+        .then(res => {
+          if (!res.ok) {
+            return res.json().then(data => {
+              throw new Error(data.error || `上传失败! 状态: ${res.status}`);
+            });
+          }
+          return res.json();
+        })
+        .then(data => {
+          const time = formatTime();
+          const fileId = data.file_id;
+          const filename = data.filename;
+          
+          // 添加到已上传文件列表
+          addFileToList(fileId, filename);
+          
+          // 显示上传成功消息
+          addMessageToUI("ai", `文件 ${filename} 上传成功`, time);
+          addMessageToDialog("ai", `文件 ${filename} 上传成功`, time);
+          updateStatus(`文件 ${filename} 上传成功`);
+        })
+        .catch(err => {
+          const time = formatTime();
+          addMessageToUI("ai", `[上传失败] ${err.message}`, time);
+          addMessageToDialog("ai", `[上传失败] ${err.message}`, time);
+          updateStatus(`上传失败: ${err.message}`, true);
+        });
+      }
+      
+      // 清空选择框，允许重新上传同一文件
+      event.target.value = "";
+    }
+    
+    // 发送消息
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      let text = input.value.trim();
+      if (!text) return;
+      
+      // 检查敏感词
+      if (containsSensitiveWords(text)) {
+        const time = formatTime();
+        addMessageToUI('ai', '涉及敏感词，消息已被拦截', time);
+        addMessageToDialog('ai', '涉及敏感词，消息已被拦截', time);
+        updateStatus('消息包含敏感词，已拦截', true);
+        input.value = '';
+        return;
+      }
+      
+      if (!currentDialogId) {
+        updateStatus('请先新建并切换到一个对话', true);
+        return;
+      }
+      
+      const time = formatTime();
+      addMessageToUI('user', text, time);
+      addMessageToDialog('user', text, time);
+      
+      input.value = '';
+      const btnSend = document.getElementById('btnSend');
+      btnSend.disabled = true;
+      
+      const modelKey = document.getElementById("apiSelector").value;
+      const dialog = dialogs.find(d => d.id === currentDialogId);
+      const history = dialog.messages.map(m => ({
+        from: m.from,
+        text: m.text,
+        time: m.time
+      }));
+      
+      updateStatus('正在分析文件内容...');
+      
+    fetch("http://127.0.0.1:5001/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            model: modelKey,
+            message: text,
+            history: history
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || `HTTP错误! 状态: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("API响应:", data);
+        
+        const reply = data.reply || data.error || "[出错了，未返回内容]";
+        const replyTime = formatTime();
+        addMessageToUI('ai', reply, replyTime);
+        addMessageToDialog('ai', reply, replyTime);
+        
+        // 移除文件内容的单独显示
+        // 文件内容已包含在模型回复中
+        
+        updateStatus('分析完成');
+    })
+    .catch(err => {
+        console.error("请求错误:", err);
+        const replyTime = formatTime();
+        addMessageToUI('ai', `[请求失败] ${err.message}`, replyTime);
+        updateStatus(`请求失败: ${err.message}`, true);
+    })
+    .finally(() => {
+        btnSend.disabled = false;
+    });
+    }
+    
+    // 保存聊天记录
+    function saveChat() {
+      if (!currentDialogId) return;
+      
+      const dialog = dialogs.find(d => d.id === currentDialogId);
+      if (!dialog) return;
+      
+      const chatData = {
+        title: dialog.title,
+        messages: dialog.messages,
+        createdAt: dialog.createdAt.toISOString()
+      };
+      
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatData, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `${dialog.title.replace(/\s+/g, '_')}.json`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+      
+      const time = formatTime();
+      addMessageToUI("ai", `聊天记录 "${dialog.title}" 已保存`, time);
+      addMessageToDialog("ai", `聊天记录 "${dialog.title}" 已保存`, time);
+      updateStatus(`聊天记录已保存: ${dialog.title}.json`);
+    }
+  </script>
+</body>
+</html>
