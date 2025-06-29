@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 ### 3. 运行应用程序  
 
-#### 3.1应用1(First 不推荐)
+#### 3.1应用1
 
 ```bash  
 # 运行应用1  
